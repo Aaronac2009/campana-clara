@@ -1,0 +1,28 @@
+# Local interface and campaign languages
+
+- React renders explicit typed translations from `i18n.ts` / `i18n-phrases.ts`, via `useI18n` or `useStore.t`. The runtime DOM translator has been removed. Registered enum labels and validation messages use `localize`; user content must never be passed to it.
+- Covered content screens: home, campaigns, creation/editing, criteria, calendar, image studio, profile/preferences, media library and resource detail, activity log, import/export, demo login. Navigation, format labels, dates, image tools and notifications use the interface language.
+- Proper names and saved campaign, calendar, activity-detail and institutional text remain unchanged. Existing activity descriptions are historical records, not translated UI. Browser-native date controls, file selectors and validation bubbles follow the browser's locale. Route head metadata remains Spanish; it is not rendered interface text.
+- Campaign text fields remain Spanish at the top level, preserving existing consumers and saved v2 data. Optional `contentEn` is independent English title, message, bullets, CTA and slogan. Existing campaigns have an empty English version. No automatic translation is performed; deterministic proposal generation remains Spanish only and switches the content tab to ES.
+- Artwork language is separate from interface language. Preview, copied text and PNG/JPG/SVG exports resolve the selected version, with `-es-` / `-en-` filenames. Institution name/header/footer are shared profile values and remain unchanged. An English campaign uses its English slogan, not a silently copied Spanish slogan.
+- Existing localStorage key and v1 backup stay intact; no reset or IndexedDB deletion is part of the upgrade. Mutations write before success is reported; quotas block changes with an error. Invalid saved JSON is not overwritten. Blob writes wait for the IndexedDB transaction to commit.
+- Current official MEP/CTPMN and original BDS logo files were not available in project assets or uploaded files. No official logo was invented or downloaded. Required inputs: an institution-supplied current official MEP logo and CTP Mercedes Norte crest in PNG/JPEG/WebP, maximum 600 KB each, with authorization and source verification. No obsolete MEP logo is used. The existing placeholder remains.
+
+## Verification
+
+Automated tests cover typed dictionary parity, React language changes, preserved user text, reload preferences, theme/system behavior, v1 preservation, unreadable data, failed writes, independent campaign fields, backup validation and selected-language artwork. Existing image import/edit/export, layout, editorial rules and local-data tests remain.
+
+Browser checks exercised English in all eleven top-level pages and media resource detail, ES/EN content editing and readback after reload, stock insertion, horizontal export to PNG/JPG/SVG (PNG 1200×630), profile header/footer readback, verified local PNG logo upload, media upload/detail, and desktop/mobile home/editor/profile in both themes. No page errors; no horizontal overflow in those six theme/size combinations.
+
+Not exhaustively verified: every error branch, keyboard-only interaction, every page on mobile, GIF/video playback, visual contrast ratios for all possible institution-selected artwork colors. The nine-view reference image was not available for image-to-image comparison. No production readiness or automatic platform publishing is claimed.
+
+## Follow-up correction
+
+- Removed invalid hook calls from the Studio import/export event handlers; exercised actual file upload, rotation, undo/redo, comparison and PNG download in Chromium. Added a UI-event regression test with mocked image processing.
+- Studio messages store untranslated source keys and translate at render, so existing errors/notices also switch back to ES. Catalogue categories, log filter actions, approval notifications and poster accessibility labels now use explicit translations. User tags remain literal, including a tag named `salud`.
+- Editor initialization waits for local restoration, not campaign count changes: saved campaigns whose count equals the demo count now show their saved English version correctly. A ready-state regression test covers this restoration signal.
+- Missing English content is never replaced with Spanish. Title is required for export; message/body/CTA/slogan are explicitly optional. Regenerating an existing Spanish draft asks before replacing copy and leaves English untouched.
+- Save-error guards abort success callbacks without uncaught React errors. Tested forced quota failures in the browser: persisted state and interface language stayed unchanged, with a visible error. Missing media bytes now produce an unavailable-file state instead of endless loading. Resource deletion aborts before deleting bytes if metadata cannot be saved.
+- Importing a legacy backup preserves matching local `contentEn` and slogan when those fields are absent; explicit incoming versions still apply after confirmation. Real browser import and editor readback verified `Keep English` survived.
+- ES↔EN checks on all eleven top-level routes at 390px, with no horizontal overflow in dark mode. Repeated desktop/mobile home/editor/profile checks in light and dark; repeated profile/logo/media flows and separate campaign PNG/JPG/SVG downloads. Catalogue dialogue checked after animation: opaque token-based background, not transparent.
+- Metadata remains Spanish; saved historical descriptions and institution fields remain original. GIF/video playback and full keyboard/contrast audits remain unverified. No deployments, remote services or resets were performed.
